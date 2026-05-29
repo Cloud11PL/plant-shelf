@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/plant-shelf/' : '/',
   plugins: [react(), tailwindcss(), VitePWA({
     strategies: 'injectManifest',
     srcDir: 'src',
