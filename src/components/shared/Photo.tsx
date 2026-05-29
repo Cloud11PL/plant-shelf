@@ -5,11 +5,11 @@ export function Photo(props: { photoId?: EntityId; photoUrls: PhotoUrls; label: 
   const url = props.photoId ? props.photoUrls[props.photoId] : undefined
 
   if (url) {
-    return <img className="h-[58px] w-[58px] flex-none rounded-lg bg-[#cbdfbd] object-cover" src={url} alt="" />
+    return <img className="h-16 w-16 flex-none rounded-2xl border border-white/70 bg-[#cbdfbd] object-cover shadow-md shadow-[#4c372e]/10" src={url} alt="" />
   }
 
   return (
-    <span className="grid h-[58px] w-[58px] flex-none place-items-center rounded-lg bg-[#cbdfbd] text-xl font-black text-[#4b372e]" aria-hidden="true">
+    <span className="grid h-16 w-16 flex-none place-items-center rounded-2xl border border-white/70 bg-gradient-to-br from-[#d4e09b] to-[#cbdfbd] text-2xl font-black text-[#4b372e] shadow-md shadow-[#4c372e]/10" aria-hidden="true">
       {props.label.slice(0, 1).toUpperCase()}
     </span>
   )

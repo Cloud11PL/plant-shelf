@@ -8,6 +8,13 @@ export interface NotificationGroup {
   body: string
 }
 
+export interface NotificationStatus {
+  secureContext: boolean
+  notificationApi: boolean
+  permission: NotificationPermission | 'unsupported'
+  serviceWorker: boolean
+}
+
 export const notificationScheduler = {
   buildGroups(reminders: Reminder[], targets: WateringTarget[]): NotificationGroup[] {
     const pending = reminders
@@ -37,13 +44,17 @@ export const notificationScheduler = {
       return {
         dueAt: group[0].dueAt,
         reminders: group,
-        title: group.length === 1 ? 'Watering due' : `${group.length} watering tasks due`,
+        title: group.length === 1 ? 'Time for water' : `${group.length} plants may want water`,
         body: `${visibleNames}${extraCount}`,
       }
     })
   },
 
   async requestPermission() {
+    if (!window.isSecureContext) {
+      return 'insecure' as const
+    }
+
     if (!('Notification' in window)) {
       return 'unsupported' as const
     }
@@ -52,8 +63,8 @@ export const notificationScheduler = {
   },
 
   async notifyDue(groups: NotificationGroup[]) {
-    if (!('Notification' in window) || Notification.permission !== 'granted') {
-      return 0
+    if (!window.isSecureContext || !('Notification' in window) || Notification.permission !== 'granted') {
+      return []
     }
 
     const now = Date.now()
@@ -71,6 +82,65 @@ export const notificationScheduler = {
         })
     })
 
-    return dueGroups.length
+    return dueGroups.flatMap((group) => group.reminders.map((reminder) => reminder.id))
   },
+
+  async notifyTest() {
+    if (!window.isSecureContext) {
+      return 'insecure' as const
+    }
+
+    if (!('Notification' in window)) {
+      return 'unsupported' as const
+    }
+
+    const permission = Notification.permission === 'default'
+      ? await Notification.requestPermission()
+      : Notification.permission
+
+    if (permission !== 'granted') {
+      return 'denied' as const
+    }
+
+    const title = 'Plant Tracker is ready'
+    const options = {
+      body: 'I can send watering nudges from this phone.',
+      tag: 'plant-tracker-test',
+      icon: '/favicon.svg',
+    }
+
+    try {
+      const registration = await serviceWorkerReadyWithTimeout()
+
+      if (registration) {
+        await registration.showNotification(title, options)
+      } else {
+        new Notification(title, options)
+      }
+    } catch {
+      new Notification(title, options)
+    }
+
+    return 'sent' as const
+  },
+
+  getStatus(): NotificationStatus {
+    return {
+      secureContext: window.isSecureContext,
+      notificationApi: 'Notification' in window,
+      permission: 'Notification' in window ? Notification.permission : 'unsupported',
+      serviceWorker: 'serviceWorker' in navigator,
+    }
+  },
+}
+
+async function serviceWorkerReadyWithTimeout() {
+  if (!('serviceWorker' in navigator)) {
+    return undefined
+  }
+
+  return Promise.race<ServiceWorkerRegistration | undefined>([
+    navigator.serviceWorker.ready,
+    new Promise((resolve) => window.setTimeout(() => resolve(undefined), 800)),
+  ])
 }

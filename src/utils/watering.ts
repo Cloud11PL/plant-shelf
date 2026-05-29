@@ -81,14 +81,14 @@ export function parseOptionalNumber(value: string) {
 
 export function labelPredictionSource(source: 'history' | 'targetInterval' | 'shelfDefault' | 'manual') {
   if (source === 'history') {
-    return 'watering history'
+    return 'how you watered before'
   }
   if (source === 'targetInterval') {
-    return 'target interval'
+    return 'this plant rhythm'
   }
   if (source === 'shelfDefault') {
-    return 'shelf default'
+    return 'this shelf rhythm'
   }
 
-  return 'fallback rhythm'
+  return 'a simple fallback'
 }

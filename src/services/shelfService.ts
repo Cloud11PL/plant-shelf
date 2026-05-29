@@ -19,6 +19,19 @@ export const shelfService = {
     return shelf
   },
 
+  async update(current: Shelf, input: { name: string; wateringIntervalDays?: number; photoId?: EntityId }) {
+    const shelf: Shelf = {
+      ...current,
+      name: input.name.trim(),
+      photoId: input.photoId ?? current.photoId,
+      wateringIntervalDays: input.wateringIntervalDays,
+      updatedAt: nowIso(),
+    }
+
+    await putRecord(STORES.shelves, shelf)
+    return shelf
+  },
+
   async remove(shelf: Shelf, plants: Plant[], reminders: Reminder[]) {
     await Promise.all([
       deleteRecord(STORES.shelves, shelf.id),

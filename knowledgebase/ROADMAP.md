@@ -89,11 +89,11 @@ Acceptance criteria:
 - Add undo after marking an item as watered.
 - Audit tap target sizes, contrast, and text overflow.
 - Test offline reload, app install behavior, and notification fallback states.
-- Plan and execute a focused shadcn/ui migration for shared UI primitives after core flows are stable.
+- Continue expanding shadcn-style shared UI primitives only when a feature needs them.
 
 Acceptance criteria:
 
 - Core flows are usable with one hand on a phone.
 - The app handles denied notification permission gracefully.
 - Offline state does not block local collection management.
-- Feature components remain grouped by context while shared controls come from shadcn/ui.
+- Feature components remain grouped by context while shared controls come from `src/components/ui`.

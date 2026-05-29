@@ -29,15 +29,14 @@ Keep files small and contextual from the first implementation.
 - Use Tailwind utility classes for application styling. Avoid large feature-specific CSS files unless a browser integration or third-party component truly needs one.
 - Add code comments only where they explain an important non-obvious decision, browser limitation, or data migration concern.
 
-## shadcn Migration Plan
+## shadcn UI
 
-Plan to migrate shared UI primitives to shadcn/ui once the core flows stabilize.
+Shared UI primitives should follow the shadcn/ui model: local, copy-owned components built on Tailwind, CVA variants, and Radix where useful.
 
-- Introduce shadcn with Tailwind CSS as the styling foundation.
-- Start with shared primitives only: Button, Input, Textarea, Label, Card, Badge, Dialog/Drawer, Tabs, and Toast.
+- Keep shared primitives in `src/components/ui`.
+- Start with shared primitives only: Button, Input, Textarea, Label, Card, Badge, Tabs, and Toast-style surfaces.
 - Keep feature components in their current contextual folders; use shadcn primitives inside them rather than moving feature logic into the UI library folder.
-- Replace repeated utility class constants gradually after matching the current visual language.
-- Do not migrate domain hooks, services, repositories, or storage code as part of the shadcn work.
+- Do not move domain hooks, services, repositories, or storage code into the UI layer.
 
 ## PWA Device Storage
 

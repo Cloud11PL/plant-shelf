@@ -13,8 +13,12 @@
 html {
   min-width: 320px;
   min-height: 100%;
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
   background:
-    linear-gradient(180deg, rgba(212, 224, 155, 0.42), rgba(246, 244, 210, 0.92) 280px),
+    radial-gradient(circle at top left, rgba(241, 156, 121, 0.3), transparent 280px),
+    radial-gradient(circle at 90% 8%, rgba(203, 223, 189, 0.8), transparent 260px),
+    linear-gradient(180deg, rgba(212, 224, 155, 0.48), rgba(246, 244, 210, 0.94) 320px),
     #f6f4d2;
 }
 
@@ -22,4 +26,12 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shelf-strip {
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
 }

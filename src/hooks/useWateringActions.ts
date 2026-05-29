@@ -15,7 +15,7 @@ const baseReminderOptions: RelativeReminderOption[] = [
   { value: '3d', label: 'In 3 days' },
   { value: '7d', label: 'In 7 days' },
   { value: '14d', label: 'In 14 days' },
-  { value: 'custom', label: 'Manual date' },
+  { value: 'custom', label: 'Pick a date' },
 ]
 
 export function useWateringActions(
@@ -23,7 +23,6 @@ export function useWateringActions(
   reminderGroups: NotificationGroup[],
   refreshData: () => Promise<void>,
   setNotice: (notice: string) => void,
-  setView: (view: 'shelves' | 'watering' | 'settings') => void,
 ) {
   const [wateringTarget, setWateringTarget] = useState<WateringTarget | undefined>()
   const [relativeReminder, setRelativeReminder] = useState<RelativeReminderValue>('7d')
@@ -42,9 +41,8 @@ export function useWateringActions(
     setRelativeReminder(suggestedRelative)
     setCustomReminderAt(toDatetimeLocalValue(suggestion.dueAt))
     setPredictionSource(suggestion.source)
-    setPredictionLabel(`${suggestion.days} days, based on ${labelPredictionSource(suggestion.source)}.`)
+    setPredictionLabel(`${suggestion.days} days, from ${labelPredictionSource(suggestion.source)}.`)
     setReminderOptions(markSuggestedOption(suggestedRelative))
-    setView('watering')
   }
 
   async function handleWatered(event: FormEvent<HTMLFormElement>) {
@@ -62,7 +60,7 @@ export function useWateringActions(
       existingReminders: data.reminders,
     })
 
-    setNotice(`${wateringTarget.name} marked as watered.`)
+    setNotice(`${wateringTarget.name} got a drink.`)
     setWateringTarget(undefined)
     setRelativeReminder('7d')
     setCustomReminderAt(fallbackCustomReminderValue())
@@ -74,12 +72,35 @@ export function useWateringActions(
 
   async function handlePermissionRequest() {
     const permission = await notificationScheduler.requestPermission()
-    setNotice(permission === 'unsupported' ? 'Notifications are not supported in this browser.' : `Notification permission: ${permission}.`)
+    setNotice(
+      permission === 'insecure'
+        ? 'Notifications need HTTPS or an installed app.'
+        : permission === 'unsupported'
+          ? 'This browser cannot send nudges.'
+          : permission === 'granted'
+            ? 'I can remind you now.'
+            : 'No worries, reminders stay in the app.',
+    )
   }
 
   async function handleNotifyDue() {
-    const count = await notificationScheduler.notifyDue(reminderGroups)
-    setNotice(count > 0 ? `${count} due notification group sent.` : 'No due reminders to notify right now.')
+    const deliveredReminderIds = await notificationScheduler.notifyDue(reminderGroups)
+    const count = deliveredReminderIds.length
+    setNotice(count > 0 ? `${count} nudge${count === 1 ? '' : 's'} sent.` : 'Nothing needs water right now.')
+  }
+
+  async function handleTestNotification() {
+    const result = await notificationScheduler.notifyTest()
+
+    if (result === 'sent') {
+      setNotice('A test nudge is on its way.')
+    } else if (result === 'insecure') {
+      setNotice('Notifications need HTTPS or an installed app.')
+    } else if (result === 'unsupported') {
+      setNotice('This browser cannot send nudges.')
+    } else {
+      setNotice('Notifications are off for now.')
+    }
   }
 
   return {
@@ -89,8 +110,10 @@ export function useWateringActions(
     reminderOptions,
     wateringTarget,
     actions: {
+      closeWatering: () => setWateringTarget(undefined),
       notifyDue: handleNotifyDue,
       requestPermission: handlePermissionRequest,
+      testNotification: handleTestNotification,
       setCustomReminderAt,
       setRelativeReminder,
       waterTarget: openWatering,
@@ -102,6 +125,6 @@ export function useWateringActions(
 function markSuggestedOption(value: RelativeReminderValue) {
   return baseReminderOptions.map((option) => ({
     ...option,
-    label: option.value === value && option.value !== 'custom' ? `${option.label} (suggested)` : option.label,
+    label: option.value === value && option.value !== 'custom' ? `${option.label} - feels right` : option.label,
   }))
 }

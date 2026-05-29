@@ -1,5 +1,5 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
-import { cn, primaryButton } from './utils/styles'
+import { Button } from './components/ui/button'
 
 function PWABadge() {
   // check for updates every hour
@@ -36,13 +36,13 @@ function PWABadge() {
       && (
         <div className="fixed right-4 bottom-20 z-10 rounded-lg border border-[#a44a3f]/20 bg-[#fffdf0] p-3 text-left shadow-[0_12px_34px_rgba(76,55,46,0.16)]">
           <div className="mb-2">
-            <span id="toast-message">New content available, click on reload button to update.</span>
+            <span id="toast-message">A fresh version is ready.</span>
               
               
           </div>
           <div className="flex gap-2">
-            <button className={primaryButton} onClick={() => updateServiceWorker(true)}>Reload</button>
-            <button className={cn(primaryButton, 'bg-[#f6f4d2]')} onClick={() => close()}>Close</button>
+            <Button onClick={() => updateServiceWorker(true)}>Use it now</Button>
+            <Button variant="outline" onClick={() => close()}>Later</Button>
           </div>
         </div>
       )}
