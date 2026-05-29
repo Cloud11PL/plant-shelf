@@ -1,6 +1,8 @@
 import type * as React from 'react'
-import { useEffect } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import { cn } from '../../utils/styles'
+
+const DialogContext = createContext<{ close: () => void } | undefined>(undefined)
 
 export function Dialog(props: {
   open: boolean
@@ -41,17 +43,31 @@ export function Dialog(props: {
   return (
     <div className="fixed inset-0 z-50 grid place-items-end bg-[#34251f]/35 p-3 backdrop-blur-sm sm:place-items-center" role="dialog" aria-modal="true">
       <button className="absolute inset-0 cursor-default" type="button" aria-label="Close dialog" onClick={() => props.onOpenChange(false)} />
-      {props.children}
+      <DialogContext.Provider value={{ close: () => props.onOpenChange(false) }}>
+        {props.children}
+      </DialogContext.Provider>
     </div>
   )
 }
 
 export function DialogContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const dialog = useContext(DialogContext)
+
   return (
     <div
-      className={cn('relative max-h-[88vh] w-full max-w-[520px] overflow-y-auto rounded-3xl border border-white/70 bg-[#fffdf0] p-4 shadow-[0_24px_70px_rgba(52,37,31,0.28)] ring-1 ring-[#a44a3f]/10', className)}
+      className={cn('relative max-h-[88vh] w-full max-w-[520px] overflow-y-auto rounded-3xl border border-white/70 bg-[#fffdf0] p-4 pr-12 shadow-[0_24px_70px_rgba(52,37,31,0.28)] ring-1 ring-[#a44a3f]/10', className)}
       {...props}
-    />
+    >
+      <button
+        className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full border border-[#a44a3f]/15 bg-[#fffdf0]/90 text-sm font-black text-[#4b372e] shadow-sm transition hover:bg-[#f6f4d2] focus:outline-none focus:ring-2 focus:ring-[#f19c79]/35"
+        type="button"
+        aria-label="Close dialog"
+        onClick={dialog?.close}
+      >
+        X
+      </button>
+      {props.children}
+    </div>
   )
 }
 
