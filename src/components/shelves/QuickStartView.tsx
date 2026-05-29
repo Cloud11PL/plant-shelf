@@ -13,8 +13,8 @@ export function QuickStartView(props: {
 }) {
   return (
     <section className="grid gap-4">
-      <Card asChild>
-        <form className="relative grid gap-4 overflow-hidden p-5" onSubmit={props.onQuickStart}>
+      <Card className="overflow-hidden">
+        <form className="relative grid gap-4 p-5" onSubmit={props.onQuickStart}>
           <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-[#d4e09b]/55 blur-2xl" />
           <div className="pointer-events-none absolute -bottom-12 -left-12 h-32 w-32 rounded-full bg-[#f19c79]/28 blur-2xl" />
           <div className="relative">
